@@ -1,74 +1,36 @@
-﻿# W13：[专用控制](https://github.com/OS-Q/W13) 
+﻿# [机电控制](https://github.com/OS-Q/W13)
 
 [![sites](OS-Q/OS-Q.png)](http://www.OS-Q.com)
 
-#### 归属闭环控制：[M3](https://github.com/OS-Q/M3)
-
+#### 归属散点控制：[M3](https://github.com/OS-Q/M3)
 #### 关于系统架构：[OS-Q](https://github.com/OS-Q/OS-Q)
 
-## [节点描述](https://github.com/OS-Q/W13/wiki) 
+[EDGE-Q](https://github.com/OS-Q/EDGE-Q) -> Q[4] -> M[12] -> W[52] -> D[365] -> H[24] -> N[60] -> S[60]
 
-专用控制控制平台
+## [工程描述](https://github.com/OS-Q/W13/wiki)
 
-### [共用资源](OS-Q/)
+[机电控制](https://github.com/OS-Q/W13)归纳整理了集成度高的arduino库，适配相应平台，实现分布控制
 
+## [工程资源](https://github.com/OS-Q/W13)
 
----
+* [资源](src/)
+* [文档](docs/)
+* [工程](project/)
 
-- 边缘设备命名规则：体系 Q:[1,4] -> 节点 M:[1,12] -> 平台 W:[1,52] -> 设备 D:[1,365]
+### [拓扑结构](https://github.com/OS-Q/W13)
 
-- naming patterns：system Q[1,4] -> node M[1,12] -> platform W[1,52] -> device D[1,365]
+* M3：[散点控制](https://github.com/OS-Q/M3)
+	* W10：[NULL](https://github.com/OS-Q/W10)
+	* W11：[NULL](https://github.com/OS-Q/W11)
+	* W12：[NULL](https://github.com/OS-Q/W12)
+	* W13：机电控制
+		* D85：[Servo](https://github.com/OS-Q/D85)
+		* D86：[NULL](https://github.com/OS-Q/D86)
+		* D87：[NULL](https://github.com/OS-Q/D87)
+		* D88：[NULL](https://github.com/OS-Q/D88)
+		* D89：[NULL](https://github.com/OS-Q/D89)
+		* D90：[NULL](https://github.com/OS-Q/D90)
+		* D91：[NULL](https://github.com/OS-Q/D91)
 
-## [包含设备](https://github.com/OS-Q/W13/wiki) 
-
-#### D85：[NULL](https://github.com/OS-Q/D85)
-
-
-
-#### D86：[NULL](https://github.com/OS-Q/D86)
-
-
-
-#### D87：[NULL](https://github.com/OS-Q/D87)
-
-
-
-#### D88：[NULL](https://github.com/OS-Q/D88)
-
-
-
-#### D89：[NULL](https://github.com/OS-Q/D89)
-
-
-
-#### D90：[NULL](https://github.com/OS-Q/D90)
-
-
-#### D91：[NULL](https://github.com/OS-Q/D91)
-
-
-
-## [同级平台](https://github.com/OS-Q/M3/wiki) 
-
-#### W10：[超低功耗](https://github.com/OS-Q/W10)
-
-基于电池供电的低功耗运行
-
-#### W11：[超高精度](https://github.com/OS-Q/W11)
-
-高精度平台的闭环控制系统
-
-#### W12：[超高速度](https://github.com/OS-Q/W12)
-
-要求控制时延和设备间同步
-
-#### -> W13：[专用控制](https://github.com/OS-Q/W13)
-
-用于专用领域设备驱动控制
-
-
----
-
-####  © qitas@qitas.cn
-###  [OS-Q redefined Operation System](http://www.OS-Q.com)
-####  @ 2019-1-6
+### [OS-Q = Open Solutions | Open Source |  Operating System ](http://www.OS-Q.com/W13)
+####  2019-9-3
