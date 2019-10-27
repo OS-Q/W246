@@ -36,8 +36,8 @@ unsigned short mssageid;
 int payloadlen_in;
 unsigned char* payload_in;
 MQTTString receivedTopic;
-char topic[100]={"/a1NOItbBML2/STM32/user/status"};//设置发布订阅主题
-//char topic[100]={"/TKKMt4nMF8U/MQTT1/mqtt"};//设置发布订阅主题
+//char topic[100]={"/a1NOItbBML2/STM32/user/status"};//设置发布订阅主题
+char topic[100]={"/TKKMt4nMF8U/MQTT1/mqtt"};//设置发布订阅主题
 char new_topic[100];
 
 char rebuf[1024];
@@ -45,10 +45,10 @@ char rebuf[1024];
 void connect_ali_login(void)
 {
 	char buffer[300];				
-	make_con_msg("123456|securemode=3,signmethod=hmacsha1,timestamp=789|",180, 1,
-	"STM32&a1NOItbBML2","fa5888273e56bef5b75062357f23e0c2d553a772",msgbuf,sizeof(msgbuf));
-	// make_con_msg("192.168.207.115|securemode=3,signmethod=hmacsha1,timestamp=789|",180, 1,
-	// "MQTT1&TKKMt4nMF8U","9076b0ebc04dba8a8ebba1f0003552dbc862c9b9",msgbuf,sizeof(msgbuf));
+//	make_con_msg("123456|securemode=3,signmethod=hmacsha1,timestamp=789|",180, 1,
+//	"STM32&a1NOItbBML2","fa5888273e56bef5b75062357f23e0c2d553a772",msgbuf,sizeof(msgbuf));
+	make_con_msg("192.168.207.115|securemode=3,signmethod=hmacsha1,timestamp=789|",180, 1,
+	"MQTT1&TKKMt4nMF8U","9076b0ebc04dba8a8ebba1f0003552dbc862c9b9",msgbuf,sizeof(msgbuf));
 	//printf("test_HASH_STR : %s\r\n",HASH_STR);
 	printf("STATUS_TOPIC : %s\r\n",STATUS_TOPIC);
 	hamacsha1(buffer);//hamacsha1字符串连接

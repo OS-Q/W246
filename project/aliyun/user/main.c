@@ -19,8 +19,6 @@
 
 #include "stm32f10x.h"
 #include "bsp_usart1.h"
-//#include "bsp_i2c_ee.h"
-//#include "bsp_i2c_gpio.h"
 
 #include "w5500.h"
 #include "W5500_conf.h"
@@ -28,8 +26,6 @@
 #include "utility.h"
 #include "dhcp.h"
 
-// #include "udp_demo.h"
-// #include "tcp_demo.h"
 #include "tcp_client.h"
 #include "ntp.h"
 #include "dns.h"
@@ -63,8 +59,8 @@ int main(void)
  	hal_init();
 	net_init();
 	dns_init();
-	//ntp_init(); 
-	//do_ntp_client();
+	ntp_init(); 
+	do_ntp_client();
 	while(1)								 		
 	{	
 		PHY_check();					// ¶ÏÏß¼ì²â	
