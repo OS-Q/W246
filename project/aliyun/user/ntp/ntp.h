@@ -9,22 +9,21 @@ typedef unsigned int tdist;
 
 typedef struct _ntpformat
 {
-   
-        uint8  dstaddr[4];        /* destination (local) address */
-        char    version;        /* version number */
-        char    leap;           /* leap indicator */
-        char    mode;           /* mode */
-        char    stratum;        /* stratum */
-        char    poll;           /* poll interval */
-        s_char  precision;      /* precision */
-        tdist   rootdelay;      /* root delay */
-        tdist   rootdisp;       /* root dispersion */
-        char    refid;          /* reference ID */
-        tstamp  reftime;        /* reference time */
-        tstamp  org;            /* origin timestamp */
-        tstamp  rec;            /* receive timestamp */
-        tstamp  xmt;            /* transmit timestamp */
-      
+    uint8  dstaddr[4];        /* destination (local) address */
+    char    version;        /* version number */
+    char    leap;           /* leap indicator */
+    char    mode;           /* mode */
+    char    stratum;        /* stratum */
+    char    poll;           /* poll interval */
+    s_char  precision;      /* precision */
+    tdist   rootdelay;      /* root delay */
+    tdist   rootdisp;       /* root dispersion */
+    char    refid;          /* reference ID */
+    tstamp  reftime;        /* reference time */
+    tstamp  org;            /* origin timestamp */
+    tstamp  rec;            /* receive timestamp */
+    tstamp  xmt;            /* transmit timestamp */
+  
 
 } ntpformat;
 
@@ -38,13 +37,14 @@ typedef struct _datetime
   uint8 ss;
 } datetime;
 
-#define ntp_port                123                     //ntp server port number
-#define SECS_PERDAY     	86400UL             	// seconds in a day = 60*60*24
-#define UTC_ADJ_HRS         	9              	        // SEOUL : GMT+9 
-#define EPOCH                   1900                    // NTP start year
-void get_seconds_from_ntp_server(uint8* buf,uint16 idx);
-void ntpclient_init(void);
+#define TX_RX_MAX_BUF_SIZE    2048		
+#define ntp_port          123                     //ntp server port number
+#define SECS_PERDAY     	86400UL             	  // seconds in a day = 60*60*24
+#define UTC_ADJ_HRS       9              	        // SEOUL : GMT+9 
+#define EPOCH             1900                    // NTP start year
+void ntp_init(void);
 void do_ntp_client(void);
+void get_seconds_from_ntp_server(uint8* buf,uint16 idx);
 tstamp change_datetime_to_seconds(void);
 void calc_date_time(tstamp seconds);
 #endif

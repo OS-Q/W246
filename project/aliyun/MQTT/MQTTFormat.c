@@ -185,6 +185,7 @@ char* MQTTFormat_toClientString(char* strbuf, int strbuflen, unsigned char* buf,
 char* MQTTFormat_toServerString(char* strbuf, int strbuflen, unsigned char* buf, int buflen)
 {
 	int index = 0;
+	int rc;
 	int rem_length = 0;
 	MQTTHeader header = {0};
 	int strindex = 0;
@@ -196,8 +197,7 @@ char* MQTTFormat_toServerString(char* strbuf, int strbuflen, unsigned char* buf,
 	{
 	case CONNECT:
 	{
-		MQTTPacket_connectData data;
-		int rc;
+		MQTTPacket_connectData data;	
 		if ((rc = MQTTDeserialize_connect(&data, buf, buflen)) == 1)
 			strindex = MQTTStringFormat_connect(strbuf, strbuflen, &data);
 	}

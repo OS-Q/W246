@@ -45,13 +45,14 @@ int MQTTDeserialize_publish(unsigned char* dup, int* qos, unsigned char* retaine
 	FUNC_ENTRY;
 	header.byte = readChar(&curdata);//读取Message Type消息类型
 	
-	printf("header.bype is %x\r\n",header.bits.type);//调试信息
+	printf("header.bype:%x\r\n",header.bits.type);//调试信息
 	
 	if (header.bits.type != PUBLISH)
 		goto exit;
 	*dup = header.bits.dup;
 	*qos = header.bits.qos;
-	printf("header.bits.qos is %d\r\n",header.bits.qos);
+
+	printf("header.bits.qos: %d\r\n",header.bits.qos);
 	*retained = header.bits.retain;
 
 	curdata += (rc = MQTTPacket_decodeBuf(curdata, &mylen)); /* read remaining length 此时curdata处于可变头部*/
@@ -60,8 +61,9 @@ int MQTTDeserialize_publish(unsigned char* dup, int* qos, unsigned char* retaine
 	if (!readMQTTLenString(topicName, &curdata, enddata) ||
 		enddata - curdata < 0) /* do we have enough data to read the protocol version byte? */
 		goto exit;
-	printf("topicname is %s\r\n",topicName->lenstring.data);//调试信息
-	printf("topicname len is%d\r\n",topicName->lenstring.len);
+
+	// printf("topicname: %s \r\n",topicName->lenstring.data); //调试信息
+	// printf("topic len: %d \r\n",topicName->lenstring.len);
 
 	if (*qos > 0)
 		*packetid = readInt(&curdata);//读取Message ID此时curdata处于有效载荷处

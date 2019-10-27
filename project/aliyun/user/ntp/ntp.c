@@ -1,14 +1,11 @@
-#include "types.h"
-#include "ntp.h"
-#include "config.h"
-#include "socket.h"
-#include "w5500.h"
-
 #include <string.h>
 #include <stdio.h>
+#include "types.h"
+#include "ntp.h"
+#include "socket.h"
+#include "w5500.h"
+#include "w5500_conf.h"
 
-ntpformat NTPformat;
-datetime Nowdatetime;
 uint8 NTP_Message[48];
 tstamp Total_Seconds=0;
 uint8 Time_Zone = 39;
@@ -16,8 +13,10 @@ uint8 NTP_Server_IP[4]={202, 112, 10, 60};
 uint8 NTP_Port = 123;
 uint8 NTP_Timeouttimer_Start=0;
 uint8 BUFPUB[2048];
-
-vu8 ntptimer = 0;
+uint8 g_ntp_cnt=0;    //counting the ntp retry number
+//vu8 ntptimer = 0;
+ntpformat NTPformat;
+datetime Nowdatetime;
 
 void get_seconds_from_ntp_server(uint8* buf,uint16 idx)
 {
@@ -163,7 +162,7 @@ void get_seconds_from_ntp_server(uint8* buf,uint16 idx)
     calc_date_time(seconds); 
 }
 
-void ntpclient_init(void)
+void ntp_init(void)
 {
 	uint8 flag;
    NTPformat.dstaddr[0] = NTP_Server_IP[0];
@@ -194,13 +193,11 @@ void ntpclient_init(void)
    memcpy(NTP_Message,(void const*)(&flag),1);
 }
 
-uint8 NTP_Retry_Cnt=0; //counting the ntp retry number
+
 
 void do_ntp_client(void)
-{
-	
+{	
     //ntp_timeouttimer_start=1; //no used here. using a retry counter
-  
     uint16 len;
     uint8 * data_buf = BUFPUB;
     uint32 destip = 0;
@@ -215,7 +212,7 @@ void do_ntp_client(void)
           recvfrom(SOCK_NTP, data_buf, len, (uint8*)&destip, &destport);	
           //printf("%d\r\n", data_buf);
           get_seconds_from_ntp_server(data_buf,startindex);
-					//return data_buf;
+          //return data_buf;
           printf("%d-%02d-%02d %02d:%02d:%02d\r\n",  
                     (ConfigMsg.date.year[0]<<8)+ConfigMsg.date.year[1],
                     ConfigMsg.date.month,
@@ -223,15 +220,15 @@ void do_ntp_client(void)
                     ConfigMsg.date.hour,
                     ConfigMsg.date.minute,
                     ConfigMsg.date.second);
-          NTP_Retry_Cnt=0;
+          g_ntp_cnt=0;
         }
         //if(Total_Seconds>0) return;
-        if(NTP_Retry_Cnt<100)
+        if(g_ntp_cnt<100)
         {  
-          if(NTP_Retry_Cnt==0)//first send request, no need to wait
+          if(g_ntp_cnt==0)//first send request, no need to wait
           {
             sendto(SOCK_NTP,NTP_Message, sizeof(NTP_Message), NTP_Server_IP, NTP_Port);
-            NTP_Retry_Cnt++;
+            g_ntp_cnt++;
             NTP_Timeouttimer_Start=1;
             ntptimer=0;
             //if(ConfigMsg.debug) printf("ntp retry: %d\r\n", ntp_retry_cnt);
@@ -241,8 +238,8 @@ void do_ntp_client(void)
             if(ntptimer>2) //wait time, 3 second
             {
               sendto(SOCK_NTP,NTP_Message,sizeof(NTP_Message),NTP_Server_IP, NTP_Port);
-              if(ConfigMsg.debug) printf("ntp retry: %d\r\n", NTP_Retry_Cnt);
-              NTP_Retry_Cnt++;
+              if(ConfigMsg.debug) printf("ntp retry: %d\r\n", g_ntp_cnt);
+              g_ntp_cnt++;
               ntptimer=0;
               
             }
@@ -250,7 +247,7 @@ void do_ntp_client(void)
         }
         else //ntp retry fail
         {
-          NTP_Retry_Cnt=0;
+          g_ntp_cnt=0;
           if(ConfigMsg.debug) printf("ntp retry failed!\r\n");
         }
         break;

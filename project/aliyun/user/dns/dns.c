@@ -1,13 +1,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
 #include "stm32f10x.h"
-#include "ult.h"
+#include "utility.h"
 #include "w5500.h"
 #include "socket.h"
 #include "dns.h"
-#include "config.h"
+#include "mqtt.h"
+#include "w5500_conf.h"
 #include "tcp_client.h"
+
+//uint8 buffer[2048]={"TKKMt4nMF8U.iot-as-mqtt.cn-shanghai.aliyuncs.com"};/*定义一个2KB的缓存*/
+uint8 domain_name[]={"a1NOItbBML2.iot-as-mqtt.cn-shanghai.aliyuncs.com"};/*定义一个2KB的缓存*/
 
 //uint8 domain_name[];
 uint8 DNS_GET_IP[4];
@@ -15,9 +20,12 @@ uint8 server_ip[4];
 uint16 MSG_ID = 0x1122;
 extern uint8 BUFPUB[1024];
 uint8 dns_num=0;
+uint8 g_dns_flag=0;
 extern CONFIG_MSG ConfigMsg;
 void do_tcp_client(void);
 
+//uint8 dns_retry_cnt=0;
+//uint8 dns_ok;
 
 int dns_makequery(uint16 op, uint8 * name, uint8 * buf, uint16 len)
 {
@@ -289,6 +297,12 @@ uint8 parseMSG(struct dhdr * pdhdr, uint8 * pbuf)
   else return 0;
 }
 
+/**
+*@brief		DHCP定时初始化
+*@param		无
+*@return	无
+*/
+
 uint8 dns_query(uint8 s, uint8 * name)
 {
   static uint32 dns_wait_time = 0;
@@ -311,8 +325,8 @@ uint8 dns_query(uint8 s, uint8 * name)
           dns_wait_time = DNS_RESPONSE_TIMEOUT;				/*DNS等待响应时间设置为超时*/
       }
       else
-      {											/*没有收到DNS服务器的UDP回复*/
-        Delay_ms(1000);			/*避免过于频繁的查询，延时1s*/
+      {									/*没有收到DNS服务器的UDP回复*/
+        delay_s(1);			/*避免过于频繁的查询，延时1s*/
         dns_wait_time++;		/*DNS等待响应时间加1*/
         //if(ConfigMsg.debug) printf("dns wait time=%d\r\n", dns_wait_time);
       }
@@ -334,49 +348,39 @@ uint8 dns_query(uint8 s, uint8 * name)
   return DNS_RET_PROGRESS;
 }
 
-uint16 do_dns(uint8 *domain_name)
+
+/**
+*@brief		DNS初始化
+*@param		无
+*@return	结果码
+*/
+
+uint8 dns_init(void)
 {
   uint8 dns_retry_cnt=0;
-  uint8 dns_ok=0;
-	uint8 flag=0;
-  if( (dns_ok==1) ||  (dns_retry_cnt > DNS_RETRY))
+  printf("DNS %s \r\n",MQTTServer);
+  if(!memcmp(ConfigMsg.dns,"\x00\x00\x00\x00",4)) //判断DNS服务器的IP地址是否配置
   {
-    return 0;
-  }
-  else if(memcmp(ConfigMsg.dns,"\x00\x00\x00\x00",4))//判断DNS服务器的IP地址是否配置
-  {
-    switch(dns_query(SOCK_DNS,domain_name))//发出DNS请求报文和解析DNS响应报文
-    {
-      case DNS_RET_SUCCESS:								//DNS解析域名成功
-        dns_ok=1;														//DNS运行标志位置1
-        memcpy(ConfigMsg.rip,DNS_GET_IP,4);//把解析到的IP地址复制给ConfigMsg.rip
-        dns_retry_cnt=0;										//DNS请求报文次数置0
-				//printf("%d.%d.%d.%d\r\n",ConfigMsg.rip[0],ConfigMsg.rip[1],ConfigMsg.rip[2],ConfigMsg.rip[3]);
-			if(flag==0)
-			{
-				memcpy(server_ip,ConfigMsg.rip,4);	//把解析出的地址赋值给MQTT的server_ip
-				printf("%d.%d.%d.%d\r\n",server_ip[0],server_ip[1],server_ip[2],server_ip[3]);
-				flag++;;
-				Delay_s(2);
-				while(1)
-				{
-						MQTT_CON_ALI();//MQTT配置
-				}
-			}
-        break;
-      case DNS_RET_FAIL:											//DNS解析域名失败
-        dns_ok=0;															//DNS运行标志位置0
-        dns_retry_cnt++;											//DNS请求报文次数加1
-        printf("Fail! Please check your network configuration or DNS server.\r\n");
-        break;
-      default:
-        break;
-    }
-  }
-  else																	//如果DNS服务器IP为0.0.0.0
     printf("Invalid DNS server [%d.%d.%d.%d]\r\n",ConfigMsg.dns[0],ConfigMsg.dns[1],ConfigMsg.dns[2],ConfigMsg.dns[3]);
-		dns_num++;
+	  return 1;
+  }
+  while(1)
+  {
+    dog_feed();	
+    if(dns_query(SOCK_DNS,domain_name)==DNS_RET_SUCCESS)  //发出DNS请求报文和解析DNS响应报文
+    {    
+      memcpy(ConfigMsg.rip,DNS_GET_IP,4);   //把解析到的IP地址复制给ConfigMsg.rip
+      if(memcmp(ConfigMsg.rip,"\x00\x00\x00\x00",4)>0) 
+      {
+        g_dns_flag=1;			
+        dns_retry_cnt=0;										    //DNS请求报文次数置0								
+        memcpy(server_ip,ConfigMsg.rip,4);	    //把解析出的地址赋值给MQTT的server_ip
+        printf("\r\nDNS : %d.%d.%d.%d\r\n",server_ip[0],server_ip[1],server_ip[2],server_ip[3]);
+        return 0;
+      }
+    }
+    printf("DNS try %d...\r\n",dns_retry_cnt++);  
+    delay_s(1);	
+  }
 }
-
-
 

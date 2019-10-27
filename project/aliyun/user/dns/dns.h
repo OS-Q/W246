@@ -2,17 +2,18 @@
 #define	_DNS_H_
 
 #include "types.h"
-#include "device.h"
-#include "config.h"
+#include "ALIYUN.h"
+#include "w5500_conf.h"
 
 extern uint8 BUFPUB[1024];
 extern uint8 dns_num;
+
 //extern uint8 domain_name[];
-#define  DNS_RESPONSE_TIMEOUT 3 // 3 seconds
-#define  DNS_RETRY            3//3 times
-#define  DNS_RET_PROGRESS  0
-#define  DNS_RET_FAIL      1
-#define  DNS_RET_SUCCESS   2
+#define  DNS_RESPONSE_TIMEOUT 	3 		// 	3 seconds
+#define  DNS_RETRY            	5		//	3 times
+#define  DNS_RET_PROGRESS  		0
+#define  DNS_RET_FAIL      		1
+#define  DNS_RET_SUCCESS   		2
 
 #define  EXTERN_DNS_SERVERIP  ConfigMsg.dns
 #define  EXTERN_DNS_SOCKBUF   gBUFPUBLIC
@@ -79,6 +80,8 @@ struct dhdr
 };
 
 extern uint8 DNS_GET_IP[4];
+
 uint8 dns_query(uint8 s, uint8 * name);
-uint16 do_dns(uint8 *domain_name);
+//uint16 do_dns(uint8 *domain_name);
+uint8 dns_init(void);
 #endif	/* _DNS_H_ */

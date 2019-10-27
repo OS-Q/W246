@@ -56,11 +56,7 @@
 /* #define USE_FULL_ASSERT    1 */
 
 /* Exported macro ------------------------------------------------------------*/
-/***************************************************
- * attribute for mcu ( types, ... ) 
- ***************************************************/
-
-
+typedef enum {FALSE = 0, TRUE = !FALSE} bool;
 
 #ifdef  USE_FULL_ASSERT
 

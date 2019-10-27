@@ -1,72 +1,77 @@
+/*W5500接STM32的 SPI1硬件接线定义*/
+//	W5500_SCS    --->     STM32_GPIOA4                /*W5500的片选管脚*/
+//	W5500_SCLK	 --->     STM32_GPIOA5                /*W5500的时钟管脚*/
+//  W5500_MISO	 --->     STM32_GPIOA6                /*W5500的MISO管脚*/
+//	W5500_MOSI	 --->     STM32_GPIOA7                /*W5500的MOSI管脚*/
+//	W5500_RESET	 --->     STM32_GPIOB1                /*W5500的RESET管脚*/
+//	W5500_INT    --->     STM32_GPIOC5                /*W5500的INT管脚*/
 
-#include "usart.h"
-#include "config.h"
-#include "device.h"
-#include "spi2.h"
-#include "socket.h"
-#include "w5500.h"
-//#include "24c16.h"
-#include "ult.h"
-#include "md5.h"
-#include "string.h"
-#include "ntp.h"
+/*W5500接STM32的 SPI2硬件接线定义*/
+//	W5500_SCS    --->     STM32_GPIOB12               /*W5500的片选管脚*/
+//	W5500_SCLK	 --->     STM32_GPIOB13               /*W5500的时钟管脚*/
+//  W5500_MISO	 --->     STM32_GPIOB14               /*W5500的MISO管脚*/
+//	W5500_MOSI	 --->     STM32_GPIOB15               /*W5500的MOSI管脚*/
+//	W5500_RESET	 --->     STM32_GPIOB1                /*W5500的RESET管脚*/
+//	W5500_INT    --->     STM32_GPIOC5                /*W5500的INT管脚*/
+
 #include <stdio.h>
+#include <string.h>
+
+#include "stm32f10x.h"
+#include "bsp_usart1.h"
+//#include "bsp_i2c_ee.h"
+//#include "bsp_i2c_gpio.h"
+
+#include "w5500.h"
+#include "W5500_conf.h"
+#include "socket.h"
+#include "utility.h"
+#include "dhcp.h"
+
+// #include "udp_demo.h"
+// #include "tcp_demo.h"
 #include "tcp_client.h"
-#include "timer.h"
-#include "usart.h"
+#include "ntp.h"
 #include "dns.h"
 
 
-extern uint8 txsize[];
-extern uint8 rxsize[];
-extern tstamp Total_Seconds;
-//extern const	uint8 str1; 
-uint8 buffer[2048]={"TKKMt4nMF8U.iot-as-mqtt.cn-shanghai.aliyuncs.com"};/*定义一个2KB的缓存*/
-																																				/*DNS解析域名*/
+int hal_init(void)
+{ 	
+	systick_init(72);				            		/*初始化Systick工作时钟*/
+	USART1_Config(); 				            		/*初始化串口通信:115200@8-n-1*/
+	dog_init(IWDG_Prescaler_256,2000);					//12s
+	//i2c_CfgGpio();				    	        	/*初始化eeprom*/
+	w5500_init();
+	timer_init();										/*初始化定时器*/
 
-int main()
-{
-	uint8 *domain_name;
-	uint8 dns_retry_cnt=0;
-  	uint8 dns_ok=0;
-	uint8 len,dns_flag=0;				// 定义串口输入的数据长度、初始化DNS标志位
-			
-	Systick_Init(72);/* 初始化Systick工作时钟*/ 
-
-	GPIO_Configuration();/* 配置GPIO*/
-		
-	USART1_Init(); /*初始化串口通信:115200@8-n-1*/
-		
-	//at24c16_init();/*初始化eeprom*/
-		
-	TIM2_NVIC_Configuration();
-	TIM2_Configuration();
-	printf("W5500 EVB initialization over.\r\n");
-
-	Reset_W5500();/*硬重启W5500*/
-	WIZ_SPI_Init();/*初始化SPI接口*/
-
-	set_default(); 	
-	set_network();
-	
-	ntpclient_init(); 
-	printf("W5500 Init Complete!\r\n");
- 	printf("Start DNS Test!\r\n");	
-	printf("\r\n[ %s ]'s IP Address is:\r\n",buffer);
-  
-	 while(1)
-  	{	
-		dns_flag=1;													// DNS标志位置1
-		if(dns_flag==1)
-		{
-			
-			if(dns_num>=6)											// DNS次数≥6
-			{
-				dns_flag=0;												// DNS标志位清0
-				dns_num=0;												// dns_num清0
-			}
-			else
-				do_dns(buffer);										// DNS过程			
-		}
-	}
+	return 0;
 }
+
+
+int net_init(void)
+{ 	
+	socket_buf_init(txsize, rxsize);					/*初始化8个Socket的发送接收缓存大小*/
+	PHY_check();										/*检查网线是否接入*/   
+	//set_mac();										/*配置MAC地址*/
+	data_init();										/*配置IP地址*/
+	//dhcp_init();	
+	return 0;
+}
+
+int main(void)
+{ 
+ 	hal_init();
+	net_init();
+	dns_init();
+	//ntp_init(); 
+	//do_ntp_client();
+	while(1)								 		
+	{	
+		PHY_check();					// 断线检测	
+		connect_ali();                   //MQTT配置
+		// do_ntp_client(); 
+		// do_tcp_server();                    /*TCP_Server 数据回环测试程序*/
+		// do_tcp_client();					/*TCP_Client 数据回环测试程序*/
+		// do_udp();							/*UDP        数据回环测试程序*/
+  	}
+} 
