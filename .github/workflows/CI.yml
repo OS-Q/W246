@@ -46,25 +46,11 @@ jobs:
       fail-fast: false
       matrix:
         example:
-          - "arduino-blink"
-          - "master_reader"
-          - "master_writer"
-          - "slave_receiver"
-          - "slave_sender"
-          - "DieTemperatureMeasurement"
-          - "HeapMemoryMeasurement"
-          - "SleepModeXMC1100"
-          - "SleepModeXMC4700"
-          - "StackMemoryMeasurement"
-          - "MotorControl"
-          - "AlarmRTC"
-          - "HibernateRTCAlarm"
-          - "SimpleRTC"
-          - "BarometricPressureSensor"
-          - "DigitalPotControl"
-          - "betterecho"
-          - "simple-echo"
-          - "doppler_speed"
+          - "mbed-rtos-blink-baremetal"
+          - "mbed-rtos-mutex"
+          - "mbed-rtos-sysinfo"
+          - "mbed-dsp"
+          - "mbed-rtos"
 
         package: ["pio","qio","all"]
     runs-on: ubuntu-latest
