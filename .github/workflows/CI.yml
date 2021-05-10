@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - pio
 
 jobs:
   CodeCheck:
@@ -52,7 +52,6 @@ jobs:
           - "mbed-dsp"
           - "mbed-rtos"
 
-        package: ["pio","qio","all"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -65,23 +64,12 @@ jobs:
         with:
           python-version: 3.9
 
-      - name: Install qio
-        if: matrix.package == 'qio'
-        run: |
-          pip install -U https://github.com/OS-Q/M03/releases/latest/download/qio.zip
-          pio platform install https://github.com/OS-Q/P245/archive/qio.zip
 
-      - name: Install pio
-        if: matrix.package == 'pio'
+      - name: Install
         run: |
+          python -m pip install --upgrade pip
           pip install -U https://github.com/platformio/platformio/archive/develop.zip
-          pio platform install https://github.com/OS-Q/P245/archive/pio.zip
-
-      - name: Install all
-        if: matrix.package == 'all'
-        run: |
-          pip install -U https://github.com/OS-Q/M03/releases/latest/download/qio.zip
-          pio platform install https://github.com/OS-Q/P245/archive/master.zip
+          # platformio platform install file://.
 
       - name: Build examples
         run: |
