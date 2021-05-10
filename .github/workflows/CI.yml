@@ -69,19 +69,19 @@ jobs:
         if: matrix.package == 'qio'
         run: |
           pip install -U https://github.com/OS-Q/M03/releases/latest/download/qio.zip
-          pio platform install https://github.com/OS-Q/P245/archive/qio.zip
+          pio platform install https://github.com/OS-Q/P246/archive/qio.zip
 
       - name: Install pio
         if: matrix.package == 'pio'
         run: |
           pip install -U https://github.com/platformio/platformio/archive/develop.zip
-          pio platform install https://github.com/OS-Q/P245/archive/pio.zip
+          pio platform install https://github.com/OS-Q/P246/archive/pio.zip
 
       - name: Install all
         if: matrix.package == 'all'
         run: |
           pip install -U https://github.com/OS-Q/M03/releases/latest/download/qio.zip
-          pio platform install https://github.com/OS-Q/P245/archive/master.zip
+          pio platform install https://github.com/OS-Q/P246/archive/master.zip
 
       - name: Build examples
         run: |
